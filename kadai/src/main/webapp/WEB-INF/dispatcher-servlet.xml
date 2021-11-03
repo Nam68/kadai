@@ -16,6 +16,7 @@
 	</bean>
 
 	<!-- Service -->
+	<bean id="csvService" class="kadai.service.CsvServiceImple"></bean>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="contentType" value="text/html; charset=UTF-8" />
