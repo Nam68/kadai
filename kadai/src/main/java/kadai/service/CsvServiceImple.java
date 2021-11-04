@@ -3,8 +3,10 @@ package kadai.service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +21,7 @@ public class CsvServiceImple implements CsvService {
 		List<CsvDTO> list = new ArrayList<CsvDTO>();
 		int total = 0;
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(csv.getInputStream()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(csv.getInputStream(), "SJIS"));
 			br.readLine(); //Throw Title Line
 			String line = "";
 			while((line = br.readLine()) != null) {
@@ -40,19 +42,55 @@ public class CsvServiceImple implements CsvService {
 			e.printStackTrace();
 		}
 		
-		result.put("list", list);
-		result.put("cost", total);
+		result.put("costList", getCost(list));
+		result.put("regionList", getRegion(list));
+		result.put("cost", numberFormat(total));
 		return result;
+	}
+	
+	public String numberFormat(int cost) {
+		DecimalFormat df = new DecimalFormat("###,###");
+		return df.format(cost);
 	}
 
 	public List getRegion(List<CsvDTO> list) {
-		
-		return null;
+		List<String[]> result = new ArrayList<String[]>();
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		for(CsvDTO dto : list) {
+			String region = dto.getAddr().substring(0, 3);
+			if(map.get(region) == null) {
+				map.put(region, 1);
+			} else {
+				map.put(region, map.get(region) +1);
+			}
+		}
+		return getStringList(map);
 	}
 
 	public List getCost(List<CsvDTO> list) {
-		
-		return null;
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		for(CsvDTO dto : list) {
+			int price = dto.getPrice();
+			if(map.get(price+"") == null) {
+				map.put(price+"", 1);
+			} else {
+				map.put(price+"", map.get(price+"") +1);
+			}
+		}
+		return getStringList(map);
+	}
+	
+	public List<String[]> getStringList(Map<String, Integer> map) {
+		List<String[]> result = new ArrayList<String[]>();
+		Iterator i = map.keySet().iterator();
+		while(i.hasNext()) {
+			String key = (String) i.next();
+			String[] str = new String[2];
+			str[0] = key;
+			str[1] = ((Integer) map.get(key))+"";
+			result.add(str);
+		}
+		return result;
 	}
 
 }
